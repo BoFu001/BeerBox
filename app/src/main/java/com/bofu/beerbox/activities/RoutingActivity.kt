@@ -1,4 +1,4 @@
-package com.bofu.beerbox
+package com.bofu.beerbox.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,16 +6,23 @@ import android.os.Bundle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class RoutingActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+
+        // Keep SplashScreen visible
+        installSplashScreen().apply {
+            setKeepOnScreenCondition{ true }
+        }
         super.onCreate(savedInstanceState)
 
-        start()
+
+        startBeerActivity()
     }
 
 
-    private fun start() {
-        val intent = Intent(this, MainActivity::class.java)
+    private fun startBeerActivity(){
+        val intent = Intent(this, BeerActivity::class.java)
         startActivity(intent)
+        finish()
     }
 }

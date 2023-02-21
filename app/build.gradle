@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.bofu.beerbox"
-        minSdk 21
+        minSdk 23
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -31,7 +31,7 @@ android {
         jvmTarget = '1.8'
     }
 
-    // viewBinding
+    // ViewBinding is a feature that allows us to write code easily that interacts with the view.
     buildFeatures {
         viewBinding true
     }
@@ -49,4 +49,18 @@ dependencies {
 
     // The SplashScreen API enables a new app launch animation when running on a device with Android 12 or higher.
     implementation 'androidx.core:core-splashscreen:1.0.0'
+
+    // The ViewModel KTX library provides a viewModelScope() function that makes it easier to launch coroutines from your ViewModel .
+    implementation 'androidx.fragment:fragment-ktx:1.5.5'
+
+    // A type-safe REST client for Android. This library makes downloading JSON or XML data from a web API fairly straightforward.
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    // Coroutines help to manage long-running tasks that might otherwise block the main thread and cause your app to become unresponsive.
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    // Glide is a fast and efficient open source media management and image loading framework for Android
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
 }
