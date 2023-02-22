@@ -9,7 +9,7 @@ class RoutingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        // Keep SplashScreen visible
+        // Keep SplashScreen visible until start the next activity
         installSplashScreen().apply {
             setKeepOnScreenCondition{ true }
         }

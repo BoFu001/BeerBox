@@ -1,13 +1,18 @@
 package com.bofu.beerbox.activities
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bofu.beerbox.R
-import com.bofu.beerbox.databinding.ActivityMainBinding
+import com.bofu.beerbox.adapters.BeerAdapter
+import com.bofu.beerbox.databinding.ActivityBeerBinding
+import com.bofu.beerbox.models.Beer
 import com.bofu.beerbox.models.NetworkResult
 import com.bofu.beerbox.services.BeerService
 import com.bofu.beerbox.viewModels.BeerViewModel
@@ -16,10 +21,9 @@ import kotlinx.coroutines.launch
 
 class BeerActivity : AppCompatActivity() {
 
-
-
     private val TAG = javaClass.simpleName
-    private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val binding: ActivityBeerBinding by lazy { ActivityBeerBinding.inflate(layoutInflater) }
+    private val beerAdapter = BeerAdapter(mutableListOf(), this::selectBeer)
 
     private val beerViewModel: BeerViewModel by viewModels {
         ViewModelFactory(application, BeerService())
@@ -29,16 +33,25 @@ class BeerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        uiSetup()
+        navigationBarSetup()
         beerViewModelSetup()
+        beerRecyclerViewSetup()
     }
 
 
-    private fun uiSetup(){
+    private fun navigationBarSetup(){
 
         supportActionBar?.displayOptions = androidx.appcompat.app.ActionBar.DISPLAY_SHOW_CUSTOM
         supportActionBar?.setDisplayShowCustomEnabled(true)
         supportActionBar?.setCustomView(R.layout.navigation_bar)
+    }
+
+    private fun beerRecyclerViewSetup(){
+        binding.beerRecyclerview.apply {
+            layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+            adapter = beerAdapter
+        }
     }
 
     private fun beerViewModelSetup() {
@@ -61,14 +74,16 @@ class BeerActivity : AppCompatActivity() {
         beerViewModel.beerLiveData.observe(this) {
             when(it){
                 is NetworkResult.ResponseSuccess<*> -> {
-                    println("aaaaa beerLiveData" + it.data)
+                    beerAdapter.update(it.data as List<Beer>)
                 }
                 is NetworkResult.Exception -> {
-                    println("aaaaa beerLiveData" + it.exception.message)
+                    Toast.makeText(this, it.exception.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
-
+    private fun selectBeer(beer: Beer, position:Int){
+        Log.d(TAG, "beer: ${beer.name}, position: $position")
+    }
 }

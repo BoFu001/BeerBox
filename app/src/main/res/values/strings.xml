@@ -2,4 +2,7 @@
     <string name="app_name">BeerBox</string>
     <string name="beer">Beer</string>
     <string name="box">Box</string>
+    <string name="weekend_offers">Weekend Offers</string>
+    <string name="free_shipping">Free shipping on orders over 60€</string>
+    <string name="more_info">MORE INFO</string>
 </resources>
