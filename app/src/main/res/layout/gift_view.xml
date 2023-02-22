@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/background_round_corner" />
+        app:srcCompat="@drawable/bg_round_corner" />
 
     <TextView
         android:id="@+id/gift_view_title"

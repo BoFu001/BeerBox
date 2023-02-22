@@ -38,7 +38,7 @@ class BeerAdapter(
         holder.beerDescription.text = item[position].description
         holder.beerImg.loadImage(item[position].image_url)
 
-        holder.itemView.setOnClickListener {
+        holder.beerMask.setOnClickListener {
             onClickListener(item[position], position)
         }
 
@@ -51,6 +51,7 @@ class BeerAdapter(
         val beerTagline: TextView = binding.rowBeerTagline
         val beerDescription: TextView = binding.rowBeerDescription
         val beerImg: ImageView = binding.rowBeerImg
+        val beerMask: ImageView = binding.rowBeerMask
     }
 
     private fun setAnimation(viewToAnimate: View, position: Int) {
