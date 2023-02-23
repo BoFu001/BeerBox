@@ -13,7 +13,8 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Tool Bar Style. -->
         <item name="toolbarStyle">@style/Theme.BeerBox.NavigationBar.Background</item>
-        <item name="android:colorBackground">@color/white</item>
+        <!-- Background Color. -->
+        <item name="android:colorBackground">@color/pink_200</item>
     </style>
 
     <style name="Theme.BeerBox.NavigationBar.Title" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
@@ -29,5 +30,9 @@
 
     <style name="Theme.BeerBox.NavigationBar.Background" parent="Widget.MaterialComponents.Toolbar.Primary">
         <item name="android:background">@color/yellow_500</item>
+    </style>
+
+    <style name="Theme.BeerBox.SearchView" parent="Widget.AppCompat.SearchView">
+        <item name="android:background">@color/white</item>
     </style>
 </resources>

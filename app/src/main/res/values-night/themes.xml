@@ -13,6 +13,7 @@
         <item name="android:statusBarColor">@color/black2</item>
         <!-- Tool Bar Style. -->
         <item name="toolbarStyle">@style/Theme.BeerBox.NavigationBar.Background</item>
+        <!-- Background Color. -->
         <item name="android:colorBackground">@color/black3</item>
     </style>
 
@@ -29,5 +30,9 @@
 
     <style name="Theme.BeerBox.NavigationBar.Background" parent="Widget.MaterialComponents.Toolbar.Primary">
         <item name="android:background">@color/black3</item>
+    </style>
+
+    <style name="Theme.BeerBox.SearchView" parent="Widget.AppCompat.SearchView">
+        <item name="android:background">@color/black4</item>
     </style>
 </resources>

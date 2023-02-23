@@ -23,8 +23,8 @@ class BeerActivity : AppCompatActivity() {
 
     private val TAG = javaClass.simpleName
     private val binding: ActivityBeerBinding by lazy { ActivityBeerBinding.inflate(layoutInflater) }
-    private val beerAdapter = BeerAdapter(mutableListOf(), this::selectBeer)
-
+    private val beerAdapter by lazy { BeerAdapter(mutableListOf(), this::selectBeer) }
+    // The beerViewModel is scoped to `this` Activity
     private val beerViewModel: BeerViewModel by viewModels {
         ViewModelFactory(application, BeerService())
     }
@@ -85,5 +85,8 @@ class BeerActivity : AppCompatActivity() {
 
     private fun selectBeer(beer: Beer, position:Int){
         Log.d(TAG, "beer: ${beer.name}, position: $position")
+
+        // Test the code performance
+        //beerViewModel.measureNanoTime()
     }
 }
