@@ -35,4 +35,9 @@
     <style name="Theme.BeerBox.SearchView" parent="Widget.AppCompat.SearchView">
         <item name="android:background">@color/black4</item>
     </style>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
 </resources>

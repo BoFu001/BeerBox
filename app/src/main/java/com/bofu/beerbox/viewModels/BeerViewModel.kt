@@ -52,7 +52,7 @@ class BeerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             Log.d(TAG, "fetchData, running on thread:" + Thread.currentThread().name)
             _uiStateFlow.update {it.copy(isLoading = true)}
-            _beerLiveData.postValue(beerService.getBeers())
+            _beerLiveData.postValue(beerService.getBeers(1))
             _uiStateFlow.update {it.copy(isLoading = false)}
         }
     }

@@ -6,11 +6,14 @@ import com.bofu.beerbox.models.NetworkResult
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 
 interface BeerApi {
     @GET("beers")
-    suspend fun getBeers(): List<Beer>
+    suspend fun getBeers(
+        @Query("page") page: Int
+    ): List<Beer>
 }
 
 class BeerService: BaseService() {
@@ -22,10 +25,10 @@ class BeerService: BaseService() {
         retrofit.create(BeerApi::class.java)
     }
 
-    suspend fun getBeers(): NetworkResult {
+    suspend fun getBeers(page: Int): NetworkResult {
 
         return try {
-            val response = beerApi.getBeers()
+            val response = beerApi.getBeers(page)
             Log.d(TAG, "getBeers On response, item size: ${response.size}")
             NetworkResult.ResponseSuccess(response)
 
