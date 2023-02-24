@@ -14,7 +14,7 @@ import com.bofu.beerbox.models.Beer
 
 class BeerAdapter(
     private val item: MutableList<Beer>,
-    private val onClickListener: (Beer, Int) -> Unit
+    private val onClickListener: (Beer) -> Unit
 ): RecyclerView.Adapter<BeerAdapter.BeerHolder>(){
 
     private var previousPosition = -1
@@ -33,13 +33,13 @@ class BeerAdapter(
     override fun getItemCount() = item.size
 
     override fun onBindViewHolder(holder: BeerHolder, position: Int) {
-        holder.beerName.text = item[position].name
+        holder.beerName.text = item[position].id.toString() + " " + item[position].name
         holder.beerTagline.text = item[position].tagline
         holder.beerDescription.text = item[position].description
         holder.beerImg.loadImage(item[position].image_url)
 
         holder.beerMask.setOnClickListener {
-            onClickListener(item[position], position)
+            onClickListener(item[position])
         }
 
         // call Animation function
@@ -59,10 +59,6 @@ class BeerAdapter(
         // scrolling to bottom
         if (position > previousPosition) {
 
-            // animation on bottom
-            // val animation = AnimationUtils.loadAnimation(viewToAnimate.context, R.anim.slide_up)
-            // viewToAnimate.startAnimation(animation)
-
             AnimatorInflater.loadAnimator(viewToAnimate.context, R.animator.fede_in_up).apply {
                 setTarget(viewToAnimate)
                 start()
@@ -70,17 +66,15 @@ class BeerAdapter(
         }
 
         // scrolling to top
+        /*
         else {
-
-            // animation on top
-            // val animation = AnimationUtils.loadAnimation(viewToAnimate.context, R.anim.slide_down)
-            // viewToAnimate.startAnimation(animation)
 
             AnimatorInflater.loadAnimator(viewToAnimate.context, R.animator.fede_in_down).apply {
                 setTarget(viewToAnimate)
                 start()
             }
         }
+        */
         previousPosition = position
     }
 }

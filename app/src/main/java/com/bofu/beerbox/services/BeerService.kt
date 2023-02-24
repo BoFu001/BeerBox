@@ -30,7 +30,7 @@ class BeerService: BaseService() {
         return try {
             val response = beerApi.getBeers(page)
             Log.d(TAG, "getBeers On response, item size: ${response.size}")
-            NetworkResult.ResponseSuccess(response)
+            NetworkResult.ResponseSuccess(response, page)
 
         } catch (exception: Throwable) {
             Log.d(TAG, "getBeers On failure, message: ${exception.message}")

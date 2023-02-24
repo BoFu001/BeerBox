@@ -3,8 +3,8 @@ package com.bofu.beerbox.activities
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
@@ -22,7 +22,7 @@ import com.bofu.beerbox.databinding.ActivityBeerBinding
 import com.bofu.beerbox.databinding.DialogBottomBinding
 import com.bofu.beerbox.extensions.loadImage
 import com.bofu.beerbox.models.Beer
-import com.bofu.beerbox.models.NetworkResult
+import com.bofu.beerbox.models.UiState
 import com.bofu.beerbox.services.BeerService
 import com.bofu.beerbox.viewModels.BeerViewModel
 import com.bofu.beerbox.viewModels.ViewModelFactory
@@ -34,7 +34,6 @@ class BeerActivity : AppCompatActivity() {
     private val TAG = javaClass.simpleName
     private val binding: ActivityBeerBinding by lazy { ActivityBeerBinding.inflate(layoutInflater) }
     private val beerAdapter by lazy { BeerAdapter(mutableListOf(), this::selectBeer) }
-    // The beerViewModel is scoped to `this` Activity
     private val beerViewModel: BeerViewModel by viewModels {
         ViewModelFactory(application, BeerService())
     }
@@ -46,6 +45,7 @@ class BeerActivity : AppCompatActivity() {
         navigationBarSetup()
         beerViewModelSetup()
         beerRecyclerViewSetup()
+        retryBtnSetup()
     }
 
 
@@ -75,17 +75,23 @@ class BeerActivity : AppCompatActivity() {
 
                 if (listOf(total, first, last).none { it == null }) {
 
-                    // Scroll to top
+                    // Touched the top
                     if(first == 0){
                         println("arrive on top!")
                     }
-                    // Scroll to bottom
+                    // Touched the bottom
                     if(last == (total!! - 1)) {
-                        println("arrive on bottom!")
+                        beerViewModel.fetchData()
                     }
                 }
             }
         })
+    }
+
+    private fun retryBtnSetup(){
+        binding.beerNoConnectionView.noConnectionBtn.setOnClickListener {
+            beerViewModel.fetchData()
+        }
     }
 
     private fun beerViewModelSetup() {
@@ -98,30 +104,62 @@ class BeerActivity : AppCompatActivity() {
             // saving resources and potentially avoiding app crashes.
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 beerViewModel.uiStateFlow.collect {
-                    println("aaaaa uiStateFlow " + it.isLoading)
-                    //render(it)
+                    render(it)
                 }
             }
         }
 
-
         beerViewModel.beerLiveData.observe(this) {
-            when(it){
-                is NetworkResult.ResponseSuccess<*> -> {
-                    beerAdapter.update(it.data as List<Beer>)
-                }
-                is NetworkResult.Exception -> {
-                    Toast.makeText(this, it.exception.message, Toast.LENGTH_LONG).show()
-                }
-            }
+            // Scroll to top
+            binding.beerRecyclerview.scrollToPosition(0)
+            // Update new list of beer
+            beerAdapter.update(it)
         }
     }
 
-    private fun selectBeer(beer: Beer, position:Int){
-        Log.d(TAG, "beer: ${beer.name}, position: $position")
+    private fun selectBeer(beer: Beer){
         showDialog(beer.name, beer.tagline, beer.description, beer.image_url)
-        // Test the code performance
-        //beerViewModel.measureNanoTime()
+    }
+
+    private fun render(uiState: UiState){
+        showNoConnectionView(uiState.hasConnection)
+        showProgressBar(uiState.isLoading)
+        //showNoResultView(uiState.errorMessage)
+        showError(uiState.errorMessage)
+        showPage(uiState.page)
+    }
+
+    private fun showNoConnectionView(bool: Boolean){
+        when(bool){
+            true -> binding.beerNoConnectionView.noConnectionViewLayout.visibility = View.GONE
+            false -> binding.beerNoConnectionView.noConnectionViewLayout.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showProgressBar(bool: Boolean){
+        when(bool){
+            true -> binding.beerProgressbar.visibility = View.VISIBLE
+            false -> binding.beerProgressbar.visibility = View.GONE
+        }
+    }
+
+    /*
+    private fun showNoResultView(bool: Boolean){
+        when(bool){
+            true -> if (mainViewModel.viewState.value!!.hasConnection) binding.mainNoResultView.noResultViewLayout.visibility = View.VISIBLE
+            false -> binding.mainNoResultView.noResultViewLayout.visibility = View.GONE
+        }
+    }*/
+
+    private fun showError(message: String?){
+        message?.let {
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun showPage(page: Int){
+        // TODO("Some mistake occurred")
+        Toast.makeText(this, "Page $page", Toast.LENGTH_LONG).show()
     }
 
     private fun showDialog(name: String, tag: String, description: String, url: String){

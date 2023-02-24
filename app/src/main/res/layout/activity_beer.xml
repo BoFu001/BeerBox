@@ -48,9 +48,8 @@
         app:layout_constraintTop_toBottomOf="@+id/beer_gift_view"
         tools:listitem="@layout/row_beer" />
 
-    <!--
     <include
-        android:id="@+id/main_no_result_view"
+        android:id="@+id/beer_no_result_view"
         layout="@layout/no_result_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -61,20 +60,18 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <include
-        android:id="@+id/main_no_connection_view"
+        android:id="@+id/beer_no_connection_view"
         layout="@layout/no_connection_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-
     <ProgressBar
-        android:id="@+id/main_progressbar"
-        style="?android:attr/progressBarStyle"
+        android:id="@+id/beer_progressbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
@@ -83,5 +80,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    -->
 </androidx.constraintlayout.widget.ConstraintLayout>

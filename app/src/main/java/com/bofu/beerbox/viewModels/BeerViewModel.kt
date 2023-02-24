@@ -27,11 +27,10 @@ class BeerViewModel(
 
     private val TAG = javaClass.simpleName
 
-
     // For internal usage
-    private val _beerLiveData = MutableLiveData<NetworkResult>(NetworkResult.ResponseSuccess(listOf<Beer>()))
+    private val _beerLiveData = MutableLiveData<List<Beer>>()
     // Only publicly exposed, never mutable, as read-only LiveData
-    val beerLiveData: LiveData<NetworkResult> = _beerLiveData
+    val beerLiveData: LiveData<List<Beer>> = _beerLiveData
 
 
     // StateFlow can be exposed from ViewModel so that the View can listen for UI state updates
@@ -40,19 +39,30 @@ class BeerViewModel(
     val uiStateFlow: StateFlow<UiState> = _uiStateFlow
 
     init {
-        if(checkConnection()) fetchData()
+        fetchData()
     }
 
-    private fun fetchData() {
+    fun fetchData() {
 
-
+        if(!checkConnection()) return
 
         // The viewModelScope is automatically canceled if the ViewModel is cleared.
         // This dispatcher is optimized to perform disk or network I/O outside of the main thread.
         viewModelScope.launch(Dispatchers.IO) {
+
             Log.d(TAG, "fetchData, running on thread:" + Thread.currentThread().name)
             _uiStateFlow.update {it.copy(isLoading = true)}
-            _beerLiveData.postValue(beerService.getBeers(1))
+
+            when(val networkResult: NetworkResult = beerService.getBeers(_uiStateFlow.value.page)){
+                is NetworkResult.ResponseSuccess -> {
+                    _beerLiveData.postValue(networkResult.data)
+                    _uiStateFlow.update { it.copy(page = networkResult.page + 1) }
+                }
+                is NetworkResult.Exception -> {
+                    _uiStateFlow.update { it.copy(errorMessage = networkResult.exception.message)}
+                }
+            }
+
             _uiStateFlow.update {it.copy(isLoading = false)}
         }
     }

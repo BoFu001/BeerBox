@@ -1,8 +1,23 @@
 <resources>
     <string name="app_name">BeerBox</string>
+
+    <!-- Navigation Bar -->
     <string name="beer">Beer</string>
     <string name="box">Box</string>
+
+    <!-- Gift View -->
     <string name="weekend_offers">Weekend Offers</string>
     <string name="free_shipping">Free shipping on orders over 60€</string>
+
+    <!-- Row Beer ItemView -->
     <string name="more_info">MORE INFO</string>
+
+    <!-- No result View -->
+    <string name="please_try_again">Please try again</string>
+    <string name="no_items_found">No beer found</string>
+
+    <!-- No connection View -->
+    <string name="oops">Oops!</string>
+    <string name="retry">Retry</string>
+    <string name="not_connected_hint">Sorry, there is no internet connection at the moment.</string>
 </resources>
