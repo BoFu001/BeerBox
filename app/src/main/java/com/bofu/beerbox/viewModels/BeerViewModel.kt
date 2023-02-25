@@ -28,6 +28,9 @@ class BeerViewModel(
     private val TAG = javaClass.simpleName
 
     // For internal usage
+    private var page = 1
+
+    // For internal usage
     private val _beerLiveData = MutableLiveData<List<Beer>>()
     // Only publicly exposed, never mutable, as read-only LiveData
     val beerLiveData: LiveData<List<Beer>> = _beerLiveData
@@ -42,7 +45,7 @@ class BeerViewModel(
         fetchData()
     }
 
-    fun fetchData() {
+    fun fetchData(addend: Int = UNCHANGED) {
 
         if(!checkConnection()) return
 
@@ -51,15 +54,19 @@ class BeerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
 
             Log.d(TAG, "fetchData, running on thread:" + Thread.currentThread().name)
+
+            _uiStateFlow.update {it.copy(errorMessage = null)}
             _uiStateFlow.update {it.copy(isLoading = true)}
 
-            when(val networkResult: NetworkResult = beerService.getBeers(_uiStateFlow.value.page)){
+            val sum = pageCheck(page + addend)
+
+            when(val networkResult: NetworkResult = beerService.getBeers(sum)){
                 is NetworkResult.ResponseSuccess -> {
                     _beerLiveData.postValue(networkResult.data)
-                    _uiStateFlow.update { it.copy(page = networkResult.page + 1) }
+                    page = sum
                 }
                 is NetworkResult.Exception -> {
-                    _uiStateFlow.update { it.copy(errorMessage = networkResult.exception.message)}
+                    _uiStateFlow.update {it.copy(errorMessage = networkResult.exception.message)}
                 }
             }
 
@@ -74,6 +81,13 @@ class BeerViewModel(
         return isConnected
     }
 
+    private fun pageCheck(sum: Int): Int{
+        return if(sum == 0) {
+            MINIMUM_PAGE
+        } else {
+            sum
+        }
+    }
 
     // The function used to measure execution time of Android code
     fun measureNanoTime(){
@@ -88,5 +102,12 @@ class BeerViewModel(
          * Dispatchers.IO    measureNanoTime: 1880209, 1356771, 1435937, 1345312, 1093750, 1837500, 1757292
          * Dispatchers.Main  measureNanoTime: 5459896, 4825000, 3920313, 4184375, 5897917, 8667708, 10731250
          */
+    }
+
+    companion object {
+        const val NEXT = 1
+        const val UNCHANGED = 0
+        const val PREVIOUS = -1
+        const val MINIMUM_PAGE = 1
     }
 }

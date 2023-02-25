@@ -26,14 +26,13 @@ class BeerService: BaseService() {
     }
 
     suspend fun getBeers(page: Int): NetworkResult {
-
         return try {
             val response = beerApi.getBeers(page)
             Log.d(TAG, "getBeers On response, item size: ${response.size}")
-            NetworkResult.ResponseSuccess(response, page)
+            NetworkResult.ResponseSuccess(response)
 
         } catch (exception: Throwable) {
-            Log.d(TAG, "getBeers On failure, message: ${exception.message}")
+            Log.d(TAG, "dddd getBeers On failure, message: ${exception.message}")
             NetworkResult.Exception(exception)
         }
     }
