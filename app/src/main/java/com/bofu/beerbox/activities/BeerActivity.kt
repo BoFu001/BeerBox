@@ -82,7 +82,7 @@ class BeerActivity : AppCompatActivity() {
 
                 val total = linearLayoutManager.itemCount
                 val firstVisible = linearLayoutManager.findFirstVisibleItemPosition()
-                val lastComplete = linearLayoutManager.findLastCompletelyVisibleItemPosition()
+                val lastVisible = linearLayoutManager.findLastVisibleItemPosition()
 
 
                 // If the first visible item is the top blank item, scroll to first beer and set stop, without refresh
@@ -93,8 +93,8 @@ class BeerActivity : AppCompatActivity() {
                     }
                 }
 
-                // If the last completely visible item is the last beer item, scroll to last beer and set stop, without refresh
-                if(lastComplete == total - number_extra_types){
+                // If the last visible item is the bottom blank item, scroll to last beer and set stop, without refresh
+                if(lastVisible == total - 1){
 
                     if(blockBottom) {
                         recyclerView.stopScroll()
