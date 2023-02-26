@@ -125,7 +125,7 @@ abstract class RefreshScrollListener(
         }
     }
 
-    open fun pullDownToRefresh() {}
+    abstract fun pullDownToRefresh()
 
-    open fun pullUpToRefresh() {}
+    abstract fun pullUpToRefresh()
 }
