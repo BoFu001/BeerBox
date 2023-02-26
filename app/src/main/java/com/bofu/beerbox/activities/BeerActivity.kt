@@ -65,12 +65,6 @@ class BeerActivity : BaseActivity() {
         })
     }
 
-    private fun retryBtnSetup(){
-        binding.beerNoConnectionView.noConnectionBtn.setOnClickListener {
-            beerViewModel.fetchData()
-        }
-    }
-
     private fun beerViewModelSetup() {
 
         // LifecycleScope is defined for each Lifecycle object.
@@ -88,19 +82,28 @@ class BeerActivity : BaseActivity() {
 
         beerViewModel.beerLiveData.observe(this) {
 
-            val linearLayoutManager = binding.beerRecyclerview.layoutManager as LinearLayoutManager?
-            val valueInPixels = resources.getDimensionPixelOffset(R.dimen.blank_item_height)
-            linearLayoutManager?.scrollToPositionWithOffset(0, -valueInPixels)
-
-
+            goToTop()
 
             // Update new list of beer
             beerAdapter.update(it)
         }
     }
 
+    private fun retryBtnSetup(){
+        binding.beerNoConnectionView.noConnectionBtn.setOnClickListener {
+            beerViewModel.fetchData()
+        }
+    }
+
     private fun selectBeer(beer: Beer){
         showDialog(beer.name, beer.tagline, beer.description, beer.image_url)
+    }
+
+    private fun goToTop() {
+
+        val linearLayoutManager = binding.beerRecyclerview.layoutManager as LinearLayoutManager
+        val valueInPixels = resources.getDimensionPixelOffset(R.dimen.blank_item_height)
+        linearLayoutManager.scrollToPositionWithOffset(0, -valueInPixels)
     }
 
     private fun render(uiState: UiState){

@@ -11,6 +11,7 @@ import com.bofu.beerbox.R
 import com.bofu.beerbox.databinding.RowBeerBinding
 import com.bofu.beerbox.databinding.RowBlankBinding
 import com.bofu.beerbox.extensions.loadImage
+import com.bofu.beerbox.extensions.setOnSafeClickListener
 import com.bofu.beerbox.models.Beer
 
 class MultipleTypeAdapter(
@@ -51,7 +52,7 @@ class MultipleTypeAdapter(
                 beerHolder.beerDescription.text = item[adjustedPosition].description
                 beerHolder.beerImg.loadImage(item[adjustedPosition].image_url)
 
-                beerHolder.beerMask.setOnClickListener {
+                beerHolder.beerMask.setOnSafeClickListener {
                     onClickListener(item[adjustedPosition])
                 }
 
