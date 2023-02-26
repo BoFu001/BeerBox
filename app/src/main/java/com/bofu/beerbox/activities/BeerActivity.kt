@@ -70,10 +70,8 @@ class BeerActivity : AppCompatActivity() {
 
             // Stop scrolling when the first and last beer items are completely visible.
             // Further scrolling should be performed only by dragging
-            var block = false
-
-            // Height of blank item
-            val valueInPixels = resources.getDimensionPixelOffset(R.dimen.blank_item_height)
+            var blockTop = false
+            var blockBottom = false
 
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -87,34 +85,19 @@ class BeerActivity : AppCompatActivity() {
                 val lastComplete = linearLayoutManager.findLastCompletelyVisibleItemPosition()
 
 
-
-
-
                 // If the first visible item is the top blank item, scroll to first beer and set stop, without refresh
                 if(firstVisible == 0){
-                    if(block){
-                        linearLayoutManager.scrollToPositionWithOffset(0, -valueInPixels)
+                    if(blockTop){
+                        //linearLayoutManager.scrollToPositionWithOffset(0, -valueInPixels)
                         recyclerView.stopScroll()
                     }
                 }
 
-
-
-
-
                 // If the last completely visible item is the last beer item, scroll to last beer and set stop, without refresh
                 if(lastComplete == total - number_extra_types){
 
-                    if(block) {
-
-                        val lastBeerItem = linearLayoutManager.findViewByPosition(lastComplete)
-                        lastBeerItem?.measuredHeight?.let {
-
-                            val offset = recyclerView.measuredHeight - it
-                            linearLayoutManager.scrollToPositionWithOffset( lastComplete, offset)
-                            recyclerView.stopScroll()
-
-                        }
+                    if(blockBottom) {
+                        recyclerView.stopScroll()
                     }
                 }
             }
@@ -123,36 +106,30 @@ class BeerActivity : AppCompatActivity() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int){
                 super.onScrollStateChanged(recyclerView, newState)
 
-
-
                 val valueInPixels = resources.getDimensionPixelOffset(R.dimen.blank_item_height)
-                val linearLayoutManager =  recyclerView.layoutManager as LinearLayoutManager?
+                val linearLayoutManager =  recyclerView.layoutManager as LinearLayoutManager
 
-                val total = linearLayoutManager?.itemCount
-                val firstVisible = linearLayoutManager?.findFirstVisibleItemPosition()
-                val firstComplete = linearLayoutManager?.findFirstCompletelyVisibleItemPosition()
-                val last = linearLayoutManager?.findLastCompletelyVisibleItemPosition()
-
-                if (listOf(total, firstComplete, last).none { it == null }) {
-
-
-                    // If the first completely visible item is top blank item, that means the top has been reached, fetch data
-                    if(firstComplete == 0){
-                        Log.d(TAG, "top reached")
-                        beerViewModel.fetchData(BeerViewModel.PREVIOUS)
-                    }
+                val total = linearLayoutManager.itemCount
+                val firstVisible = linearLayoutManager.findFirstVisibleItemPosition()
+                val firstComplete = linearLayoutManager.findFirstCompletelyVisibleItemPosition()
+                val lastVisible = linearLayoutManager.findLastVisibleItemPosition()
+                val lastComplete = linearLayoutManager.findLastCompletelyVisibleItemPosition()
 
 
-                    // Touched the bottom without blank items
-                    //if(last == (total!! - 1)) {
-                    // Touched the bottom with blank items fetch data
-                    if(last == (total!! - 1) && total > number_extra_types) {
-                        Log.d(TAG, "bottom reached")
-                        beerViewModel.fetchData(BeerViewModel.NEXT)
-                    }
+                // If the first completely visible item is top blank item, that means the top has been reached, fetch data
+                if(firstComplete == 0){
+                    Log.d(TAG, "top reached")
+                    beerViewModel.fetchData(BeerViewModel.PREVIOUS)
                 }
 
 
+                // Touched the bottom without blank items
+                //if(last == (total!! - 1)) {
+                // Touched the bottom with blank items fetch data
+                if(lastComplete == (total - 1) && total > number_extra_types) {
+                    Log.d(TAG, "bottom reached")
+                    beerViewModel.fetchData(BeerViewModel.NEXT)
+                }
 
                 when(newState) {
 
@@ -161,26 +138,41 @@ class BeerActivity : AppCompatActivity() {
                     }
 
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        // Set a stop block if scrolling starts from the middle of list
                         Log.d(TAG, "onScrollStateChanged: DRAGGING")
-                        firstVisible?.let { _firstVisible ->
-                            if(_firstVisible in 2..24){
-                                block = true
-                            }
+                        // Set a stop block if scrolling starts from the middle of list
+                        if(firstVisible > 1){
+                            blockTop = true
+                        }
+                        if(lastVisible < total - 2){
+                            blockBottom = true
                         }
                     }
 
                     RecyclerView.SCROLL_STATE_IDLE -> {
-                        // If the first visible item is the first blank item, scroll to first beer
                         Log.d(TAG, "onScrollStateChanged: STOPPED")
+                        // If the first visible item is the first blank item, scroll to first beer
                         if(firstVisible == 0){
-                            block = false
                             linearLayoutManager.scrollToPositionWithOffset(0, -valueInPixels)
                         }
 
                         // Don't set a stop block if scrolling starts from the first beer item
-                        if(firstVisible == 1){
-                            block = false
+                        if(firstVisible <= 1){
+                            blockTop = false
+                        }
+
+                        // If the last visible item is the last blank item, scroll to last beer
+                        if(lastVisible == total - 1){
+                            val lastBeerItem = linearLayoutManager.findViewByPosition(lastComplete)
+                            lastBeerItem?.measuredHeight?.let {
+
+                                val offset = recyclerView.measuredHeight - it
+                                linearLayoutManager.scrollToPositionWithOffset( lastComplete, offset)
+                            }
+                        }
+
+                        // Don't set a stop block if scrolling starts from the last beer item
+                        if(lastVisible >= total - 2){
+                            blockBottom = false
                         }
                     }
                 }
