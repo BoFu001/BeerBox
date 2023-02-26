@@ -1,16 +1,9 @@
 package com.bofu.beerbox.activities
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-import android.view.Window
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,8 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bofu.beerbox.R
 import com.bofu.beerbox.adapters.MultipleTypeAdapter
 import com.bofu.beerbox.databinding.ActivityBeerBinding
-import com.bofu.beerbox.databinding.DialogBottomBinding
-import com.bofu.beerbox.extensions.loadImage
 import com.bofu.beerbox.models.Beer
 import com.bofu.beerbox.models.UiState
 import com.bofu.beerbox.services.BeerService
@@ -29,11 +20,10 @@ import com.bofu.beerbox.viewModels.ViewModelFactory
 import kotlinx.coroutines.launch
 
 
-class BeerActivity : AppCompatActivity() {
+class BeerActivity : BaseActivity() {
 
     private val TAG = javaClass.simpleName
     private val binding: ActivityBeerBinding by lazy { ActivityBeerBinding.inflate(layoutInflater) }
-    //private val beerAdapter by lazy { BeerAdapter(mutableListOf(), this::selectBeer) }
     private val beerAdapter by lazy { MultipleTypeAdapter(mutableListOf(), number_extra_types, this::selectBeer) }
     private val beerViewModel: BeerViewModel by viewModels {
         ViewModelFactory(application, BeerService())
@@ -97,9 +87,6 @@ class BeerActivity : AppCompatActivity() {
         }
 
         beerViewModel.beerLiveData.observe(this) {
-            // Scroll to top (after the first black item which has index 0)
-            //binding.beerRecyclerview.scrollToPosition(1)
-
 
             val linearLayoutManager = binding.beerRecyclerview.layoutManager as LinearLayoutManager?
             val valueInPixels = resources.getDimensionPixelOffset(R.dimen.blank_item_height)
@@ -149,32 +136,6 @@ class BeerActivity : AppCompatActivity() {
         message?.let {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun showDialog(name: String, tag: String, description: String, url: String){
-
-
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        val dialogBottomBinding = DialogBottomBinding.inflate(layoutInflater)
-        builder.setView(dialogBottomBinding.root)
-
-        dialogBottomBinding.dialogBottomName.text = name
-        dialogBottomBinding.dialogBottomTagline.text = tag
-        dialogBottomBinding.dialogBottomDescription.text = description
-        dialogBottomBinding.dialogBottomImg.loadImage(url)
-
-        val dialog = builder.create()
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_bottom)
-        dialog.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
-        dialog.window?.setGravity(Gravity.BOTTOM)
-
-        dialog.show()
     }
 
     companion object{
