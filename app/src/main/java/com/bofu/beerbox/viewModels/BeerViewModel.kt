@@ -151,6 +151,21 @@ class BeerViewModel(
         return _filter.none { it.isChecked }
     }
 
+    fun search(p0: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            if(p0 == null){
+                performFilter(_beers)
+            } else {
+                val filteredBeers = _beers.filter{
+                    it.name.lowercase().contains(p0.lowercase())
+                } as MutableList<Beer>
+
+                performFilter(filteredBeers)
+            }
+        }
+    }
+
     // The function used to measure execution time of Android code
     fun measureNanoTime(){
         val elapsedTime = measureNanoTime {

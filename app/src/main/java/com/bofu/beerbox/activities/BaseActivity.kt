@@ -2,9 +2,11 @@ package com.bofu.beerbox.activities
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bofu.beerbox.R
@@ -13,7 +15,16 @@ import com.bofu.beerbox.extensions.loadImage
 
 open class BaseActivity : AppCompatActivity() {
 
-     fun showDialog(name: String, tag: String, description: String, url: String){
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        windowSetup()
+    }
+
+    private fun windowSetup(){
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+    }
+    fun showDialog(name: String, tag: String, description: String, url: String){
 
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)

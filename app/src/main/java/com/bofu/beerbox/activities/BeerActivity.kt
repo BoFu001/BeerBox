@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -41,6 +42,7 @@ class BeerActivity : BaseActivity() {
         beerRecyclerViewSetup()
         filterRecyclerViewSetup()
         retryBtnSetup()
+        setupSearchView()
     }
 
 
@@ -61,12 +63,14 @@ class BeerActivity : BaseActivity() {
 
         binding.beerRecyclerview.addOnScrollListener(object : RefreshScrollListener(resources, number_extra_types) {
             override fun pullDownToRefresh(){
-                if(beerViewModel.hasNoFilter()){
+                // Refresh list only when there is no filter
+                if(beerViewModel.hasNoFilter() && binding.beerSearchView.query.toString() == ""){
                     beerViewModel.fetchData(BeerViewModel.PREVIOUS)
                 }
             }
             override fun pullUpToRefresh(){
-                if(beerViewModel.hasNoFilter()){
+                // Refresh list only when there is no filter
+                if(beerViewModel.hasNoFilter() && binding.beerSearchView.query.toString() == ""){
                     beerViewModel.fetchData(BeerViewModel.NEXT)
                 }
             }
@@ -119,11 +123,32 @@ class BeerActivity : BaseActivity() {
         }
     }
 
+    private fun setupSearchView() {
+        binding.beerSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                beerViewModel.search(p0)
+                return false
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                beerViewModel.search(p0)
+                return false
+            }
+        })
+    }
+
+    private fun clearSearchView(){
+        binding.beerSearchView.setQuery("", false)
+        binding.beerSearchView.clearFocus()
+        binding.beerSearchView.isIconified = true
+    }
     private fun selectBeer(beer: Beer){
         showDialog(beer.name, beer.tagline, beer.description, beer.image_url)
     }
 
     private fun selectFilter(filter: Filter){
+        clearSearchView()
         beerViewModel.setFilter(filter)
     }
 

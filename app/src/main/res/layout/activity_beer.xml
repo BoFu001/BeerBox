@@ -8,7 +8,7 @@
     android:theme="@style/Theme.BeerBox">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/beer_search_view"
+        android:id="@+id/beer_search_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="8dp"
@@ -20,8 +20,10 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.appcompat.widget.SearchView
+            android:id="@+id/beer_search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:queryBackground="@android:color/transparent"
             style="@style/Theme.BeerBox.SearchView"/>
 
     </androidx.cardview.widget.CardView>
@@ -34,7 +36,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/beer_search_view"
+        app:layout_constraintTop_toBottomOf="@+id/beer_search_card_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
