@@ -23,6 +23,8 @@ This is an Android app written in Kotlin, which displays a list of beers. The us
 4. **Coroutines** to convert async callbacks for long-running tasks into sequential code.
 5. **View Binding** to generate a binding class for each XML layout file.
 
+<br>
+
 <p align="center">
   <img src="readme/screenshot_dark.png" width ="200" title="Dark theme"/>
   <img src="readme/screenshot_light.png" width ="200" title="Light theme"/>
