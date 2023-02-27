@@ -64,7 +64,7 @@ class BeerActivity : BaseActivity() {
     }
 
     private fun selectBeer(beer: Beer){
-        showDialog(beer.name, beer.tagline, beer.description, beer.image_url)
+        showDialog(beer.id, beer.name, beer.tagline, beer.description, beer.image_url)
     }
 
     private fun filterRecyclerViewSetup(){

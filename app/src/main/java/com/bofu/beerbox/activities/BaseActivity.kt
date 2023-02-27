@@ -24,14 +24,14 @@ open class BaseActivity : AppCompatActivity() {
     private fun windowSetup(){
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
     }
-    fun showDialog(name: String, tag: String, description: String, url: String){
+    fun showDialog(id: Short, name: String, tag: String, description: String, url: String){
 
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         val dialogBottomBinding = DialogBottomBinding.inflate(layoutInflater)
         builder.setView(dialogBottomBinding.root)
 
-        dialogBottomBinding.dialogBottomName.text = name
+        dialogBottomBinding.dialogBottomName.text = id.toString() + " " + name
         dialogBottomBinding.dialogBottomTagline.text = tag
         dialogBottomBinding.dialogBottomDescription.text = description
         dialogBottomBinding.dialogBottomImg.loadImage(url)
