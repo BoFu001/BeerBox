@@ -105,7 +105,6 @@ class BeerActivity : BaseActivity() {
             goToTop()
             // Update new list of beer
             beerAdapter.update(it)
-            showNoResultView(it.size == 0)
         }
 
 
@@ -163,6 +162,7 @@ class BeerActivity : BaseActivity() {
         showNoConnectionView(uiState.hasConnection)
         showProgressBar(uiState.isLoading)
         showError(uiState.errorMessage)
+        showNoResultView(uiState.emptyResult)
     }
 
     private fun showNoConnectionView(bool: Boolean){

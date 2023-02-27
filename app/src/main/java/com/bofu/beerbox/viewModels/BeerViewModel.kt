@@ -74,7 +74,7 @@ class BeerViewModel(
             when(val networkResult: NetworkResult = beerService.getBeers(sum)){
                 is NetworkResult.ResponseSuccess -> {
                     _beers = networkResult.data
-                    _beerLiveData.postValue(_beers)
+                    performFilter(_beers)
                     page = sum
                 }
                 is NetworkResult.Exception -> {
@@ -130,20 +130,23 @@ class BeerViewModel(
 
     private fun performFilter(beers: MutableList<Beer>?){
 
-        viewModelScope.launch(Dispatchers.IO) {
+        Log.d(TAG, "fetchData performFilter, running on thread:" + Thread.currentThread().name)
 
-            if(hasNoFilter()){
-                _beerLiveData.postValue(beers)
-            } else {
-                val keyword = _filter.single { it.isChecked }.name
-                val filteredBeers = beers?.filter{
-                    it.name.lowercase().contains(keyword.lowercase()) ||
-                    it.tagline.lowercase().contains(keyword.lowercase()) ||
-                    it.description.contains(keyword.lowercase())
-                } as MutableList<Beer>
+        if(hasNoFilter()){
+            _beerLiveData.postValue(beers)
+        } else {
+            val keyword = _filter.single { it.isChecked }.name
+            val filteredBeers = beers?.filter{
+                it.name.lowercase().contains(keyword.lowercase()) ||
+                it.tagline.lowercase().contains(keyword.lowercase()) ||
+                it.description.contains(keyword.lowercase())
+            } as MutableList<Beer>
 
-                _beerLiveData.postValue(filteredBeers)
-            }
+            _beerLiveData.postValue(filteredBeers)
+        }
+
+        viewModelScope.launch(Dispatchers.Main) {
+            _uiStateFlow.update {it.copy(emptyResult = beerLiveData.value?.size == 0)}
         }
     }
 
