@@ -22,7 +22,7 @@ This is an Android app written in Kotlin, which displays a list of beers. User c
 3. **LiveData** to create observable objects that respects lifecycle of other app components.
 4. **StateFlow** to be exposed from ViewModel so that the View can listen for UI state updates.
 5. **Coroutines** to convert async callbacks for long-running tasks into sequential code.
-6. **viewBinding** to generate a binding class for each XML layout file.
+6. **ViewBinding** to generate a binding class for each XML layout file.
 
 <br>
 
