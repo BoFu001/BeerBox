@@ -4,10 +4,6 @@ This is an Android app written in Kotlin, which displays a list of beers. The us
 
 <br>
 
-<p align="center">
-  <img src="readme/screenrecord.gif" width="300">
-</p>
-
 #### This app has following packages:
 1. **activities**: It contains activities interacting with the user.
 2. **adapters**: It contains adapters which provide access to the data items.
@@ -25,7 +21,14 @@ This is an Android app written in Kotlin, which displays a list of beers. The us
 
 <br>
 
-<p align="center">
-  <img src="readme/screenshot_dark.png" width ="200" title="Dark theme"/>
-  <img src="readme/screenshot_light.png" width ="200" title="Light theme"/>
-</p>
+<div style="display:flex">
+     <div style="flex:1;padding-right:10px;">
+          <img src="readme/screenrecord.gif" width="200"/>
+     </div>
+     <div style="flex:1;padding-left:10px;">
+          <img src="readme/screenshot_dark.png" width="200"/>
+     </div>
+     <div style="flex:1;padding-left:10px;">
+          <img src="readme/screenshot_light.png" width="200"/>
+     </div>
+</div>
