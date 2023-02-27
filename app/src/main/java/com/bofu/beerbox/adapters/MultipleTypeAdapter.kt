@@ -16,8 +16,8 @@ import com.bofu.beerbox.models.Beer
 
 class MultipleTypeAdapter(
     private val item: MutableList<Beer>,
-    private val numExtraType: Int,
-    private val onClickListener: (Beer) -> Unit
+    private val onClickListener: (Beer) -> Unit,
+    private var numExtraType: Int = 2
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
     private var previousPosition = -1
@@ -25,6 +25,14 @@ class MultipleTypeAdapter(
     fun update(newData: List<Beer>) {
         item.clear()
         item.addAll(newData)
+        notifyDataSetChanged()
+    }
+
+    fun enableRefresh(bool: Boolean){
+        numExtraType = when(bool){
+            true -> 2
+            false -> 0
+        }
         notifyDataSetChanged()
     }
 
@@ -45,7 +53,16 @@ class MultipleTypeAdapter(
 
         when (getItemViewType(position)) {
             TYPE_BEER -> {
-                val adjustedPosition = position - 1
+
+                val adjustedPosition = when(numExtraType){
+                    0 -> {
+                        position
+                    }
+                    else -> {
+                        position - 1
+                    }
+                }
+
                 val beerHolder = holder as BeerHolder
                 beerHolder.beerName.text = item[adjustedPosition].id.toString() + " " + item[adjustedPosition].name
                 beerHolder.beerTagline.text = item[adjustedPosition].tagline
@@ -121,17 +138,27 @@ class MultipleTypeAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (position) {
+        when(numExtraType){
             0 -> {
-                TYPE_FIRST
-            }
-            (item.size + numExtraType - 1) -> {
-                TYPE_LAST
+                return TYPE_BEER
             }
             else -> {
-                TYPE_BEER
+                return when (position) {
+                    0 -> {
+                        TYPE_FIRST
+                    }
+                    (item.size + numExtraType - 1) -> {
+                        TYPE_LAST
+                    }
+                    else -> {
+                        TYPE_BEER
+                    }
+                }
             }
         }
+
+
+
     }
 
     companion object {

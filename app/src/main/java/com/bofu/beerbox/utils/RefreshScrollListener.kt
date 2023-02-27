@@ -9,7 +9,7 @@ import com.bofu.beerbox.R
 abstract class RefreshScrollListener(
 
     private val resources: Resources,
-    private val numberExtraTypes: Int
+    private val numberExtraTypes: Int = 2
 
 ): RecyclerView.OnScrollListener()  {
 

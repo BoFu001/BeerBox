@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bofu.beerbox.R
 import com.bofu.beerbox.adapters.FilterAdapter
 import com.bofu.beerbox.adapters.MultipleTypeAdapter
@@ -17,6 +18,7 @@ import com.bofu.beerbox.models.Beer
 import com.bofu.beerbox.models.Filter
 import com.bofu.beerbox.models.UiState
 import com.bofu.beerbox.services.BeerService
+import com.bofu.beerbox.utils.CustomLayoutManager
 import com.bofu.beerbox.utils.RefreshScrollListener
 import com.bofu.beerbox.viewModels.BeerViewModel
 import com.bofu.beerbox.viewModels.ViewModelFactory
@@ -27,7 +29,7 @@ class BeerActivity : BaseActivity() {
 
     private val TAG = javaClass.simpleName
     private val binding: ActivityBeerBinding by lazy { ActivityBeerBinding.inflate(layoutInflater) }
-    private val beerAdapter by lazy { MultipleTypeAdapter(mutableListOf(), number_extra_types, this::selectBeer) }
+    private val beerAdapter by lazy { MultipleTypeAdapter(mutableListOf(), this::selectBeer) }
     private val filterAdapter by lazy { FilterAdapter(mutableListOf(), this::selectFilter) }
     private val beerViewModel: BeerViewModel by viewModels {
         ViewModelFactory(application, BeerService())
@@ -38,13 +40,12 @@ class BeerActivity : BaseActivity() {
         setContentView(binding.root)
 
         navigationBarSetup()
-        beerViewModelSetup()
         beerRecyclerViewSetup()
         filterRecyclerViewSetup()
+        searchViewSetup()
         retryBtnSetup()
-        setupSearchView()
+        beerViewModelSetup()
     }
-
 
     private fun navigationBarSetup(){
         supportActionBar?.apply {
@@ -56,29 +57,17 @@ class BeerActivity : BaseActivity() {
 
     private fun beerRecyclerViewSetup(){
         binding.beerRecyclerview.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = CustomLayoutManager(context)
             setHasFixedSize(true)
             adapter = beerAdapter
         }
+    }
 
-        binding.beerRecyclerview.addOnScrollListener(object : RefreshScrollListener(resources, number_extra_types) {
-            override fun pullDownToRefresh(){
-                // Refresh list only when there is no filter
-                if(beerViewModel.hasNoFilter() && binding.beerSearchView.query.toString() == ""){
-                    beerViewModel.fetchData(BeerViewModel.PREVIOUS)
-                }
-            }
-            override fun pullUpToRefresh(){
-                // Refresh list only when there is no filter
-                if(beerViewModel.hasNoFilter() && binding.beerSearchView.query.toString() == ""){
-                    beerViewModel.fetchData(BeerViewModel.NEXT)
-                }
-            }
-        })
+    private fun selectBeer(beer: Beer){
+        showDialog(beer.name, beer.tagline, beer.description, beer.image_url)
     }
 
     private fun filterRecyclerViewSetup(){
-
         binding.beerFilterRecyclerview.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
@@ -86,43 +75,12 @@ class BeerActivity : BaseActivity() {
         }
     }
 
-    private fun beerViewModelSetup() {
-
-        // LifecycleScope is defined for each Lifecycle object.
-        // Any coroutine launched in this scope is canceled when the Lifecycle is destroyed.
-        lifecycleScope.launch{
-
-            // This approach processes the flow emissions only when the UI is visible on the screen,
-            // saving resources and potentially avoiding app crashes.
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                beerViewModel.uiStateFlow.collect {
-                    render(it)
-                }
-            }
-        }
-
-        beerViewModel.beerLiveData.observe(this) {
-            goToTop()
-            // Update new list of beer
-            beerAdapter.update(it)
-        }
-
-
-
-        beerViewModel.filterLiveData.observe(this) {
-            filterAdapter.update(it)
-        }
-
-
+    private fun selectFilter(filter: Filter){
+        clearSearchView()
+        beerViewModel.setFilter(filter)
     }
 
-    private fun retryBtnSetup(){
-        binding.beerNoConnectionView.noConnectionBtn.setOnClickListener {
-            beerViewModel.fetchData()
-        }
-    }
-
-    private fun setupSearchView() {
+    private fun searchViewSetup() {
         binding.beerSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
             android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -142,27 +100,103 @@ class BeerActivity : BaseActivity() {
         binding.beerSearchView.clearFocus()
         binding.beerSearchView.isIconified = true
     }
-    private fun selectBeer(beer: Beer){
-        showDialog(beer.name, beer.tagline, beer.description, beer.image_url)
+
+    private fun retryBtnSetup(){
+        binding.beerNoConnectionView.noConnectionBtn.setOnClickListener {
+            beerViewModel.fetchData()
+        }
     }
 
-    private fun selectFilter(filter: Filter){
-        clearSearchView()
-        beerViewModel.setFilter(filter)
+    private fun beerViewModelSetup() {
+
+        // LifecycleScope is defined for each Lifecycle object.
+        // Any coroutine launched in this scope is canceled when the Lifecycle is destroyed.
+        lifecycleScope.launch{
+
+            // This approach processes the flow emissions only when the UI is visible on the screen,
+            // saving resources and potentially avoiding app crashes.
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                beerViewModel.uiStateFlow.collect {
+                    render(it)
+                }
+            }
+        }
+
+        beerViewModel.beerLiveData.observe(this) {
+
+            // Refresh beer list only if there is neither filter nor search keyword
+            val bool = beerViewModel.hasNoFilter() && binding.beerSearchView.query.toString() == ""
+            enableRefresh(bool)
+
+            // Update new list of beer
+            beerAdapter.update(it)
+
+            // go to top of the list
+            goToTop()
+        }
+
+        beerViewModel.filterLiveData.observe(this) {
+            filterAdapter.update(it)
+        }
+    }
+
+    private fun enableRefresh(bool: Boolean){
+        //set adapter
+        beerAdapter.enableRefresh(bool)
+        //set listener
+        beerRecyclerViewListenerUpdate(bool)
+        //set top
+        setTop(bool)
+    }
+
+    private fun beerRecyclerViewListenerUpdate(bool: Boolean){
+
+        val scrollListener = when(bool) {
+            true -> {
+                object : RefreshScrollListener(resources) {
+                    override fun pullDownToRefresh() {
+                        beerViewModel.fetchData(BeerViewModel.PREVIOUS)
+                    }
+
+                    override fun pullUpToRefresh() {
+                        beerViewModel.fetchData(BeerViewModel.NEXT)
+                    }
+                }
+            }
+            false -> {
+                object : RecyclerView.OnScrollListener() {}
+            }
+        }
+
+        binding.beerRecyclerview.clearOnScrollListeners()
+        binding.beerRecyclerview.addOnScrollListener(scrollListener)
+    }
+
+    private fun setTop(bool: Boolean) {
+
+        val topOffset = when(bool){
+            true -> {
+                resources.getDimensionPixelOffset(R.dimen.blank_item_height) * -1
+            }
+            false -> {
+                0
+            }
+        }
+
+        val customLayoutManager = binding.beerRecyclerview.layoutManager as CustomLayoutManager
+        customLayoutManager.setTopOffset(topOffset)
     }
 
     private fun goToTop() {
-
-        val linearLayoutManager = binding.beerRecyclerview.layoutManager as LinearLayoutManager
-        val valueInPixels = resources.getDimensionPixelOffset(R.dimen.blank_item_height)
-        linearLayoutManager.scrollToPositionWithOffset(0, -valueInPixels)
+        val customLayoutManager = binding.beerRecyclerview.layoutManager as CustomLayoutManager
+        customLayoutManager.goToTop()
     }
 
     private fun render(uiState: UiState){
         showNoConnectionView(uiState.hasConnection)
         showProgressBar(uiState.isLoading)
-        showError(uiState.errorMessage)
         showNoResultView(uiState.emptyResult)
+        showError(uiState.errorMessage)
     }
 
     private fun showNoConnectionView(bool: Boolean){
@@ -196,9 +230,5 @@ class BeerActivity : BaseActivity() {
         message?.let {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         }
-    }
-
-    companion object{
-        private const val number_extra_types = 2
     }
 }
