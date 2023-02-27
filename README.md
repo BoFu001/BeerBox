@@ -4,6 +4,10 @@ This is an Android app written in Kotlin, which displays a list of beers. The us
 
 <br>
 
+<p align="center">
+  <img src="readme/screenrecord.gif" width="300">
+</p>
+
 #### This app has following packages:
 1. **activities**: It contains activities interacting with the user.
 2. **adapters**: It contains adapters which provide access to the data items.
@@ -19,10 +23,7 @@ This is an Android app written in Kotlin, which displays a list of beers. The us
 4. **Coroutines** to convert async callbacks for long-running tasks into sequential code.
 5. **View Binding** to generate a binding class for each XML layout file.
 
-
-<div style="display: flex; flex-direction: row;">
-
- <img class="img" src="readme/screenrecord.gif" title="Screen record"/>
- <img class="img" src="readme/screenshot_dark.png"  title="Dark theme"/>
- <img class="img" src="readme/screenshot_light.png" title="Light theme"/>
-</div>
+<p align="center">
+  <img src="readme/screenshot_dark.png" width ="200" title="Dark theme"/>
+  <img src="readme/screenshot_light.png" width ="200" title="Light theme"/>
+</p>
