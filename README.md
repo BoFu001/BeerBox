@@ -27,11 +27,11 @@ This is an Android app written in Kotlin, which displays a list of beers. User c
 <br>
 
 <p align="center">
-  <img src="screenshot1.png" width ="150" style="margin: 2px;"/>
-  <img src="screenshot2.png" width ="150" style="margin: 2px;"/>
-  <img src="screenshot3.png" width ="150" style="margin: 2px;"/>
-  <img src="screenshot4.png" width ="150" style="margin: 2px;"/>
-  <img src="screenshot5.png" width ="150" style="margin: 2px;"/>
+  <img src="readme/screenshot1.png" width ="150" style="margin: 2px;"/>
+  <img src="readme/screenshot2.png" width ="150" style="margin: 2px;"/>
+  <img src="readme/screenshot3.png" width ="150" style="margin: 2px;"/>
+  <img src="readme/screenshot4.png" width ="150" style="margin: 2px;"/>
+  <img src="readme/screenshot5.png" width ="150" style="margin: 2px;"/>
 </p>
 
 
