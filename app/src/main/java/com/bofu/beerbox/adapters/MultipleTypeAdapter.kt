@@ -61,11 +61,23 @@ class MultipleTypeAdapter(
             }
             TYPE_FIRST -> {
                 val blankHolder = holder as BlankHolder
-                blankHolder.blankTextView.text = "FIRST"
+                if(item.size > numExtraType) {
+                    blankHolder.arrowPrevious.visibility = View.VISIBLE
+                    blankHolder.arrowNext.visibility = View.GONE
+                } else {
+                    blankHolder.arrowPrevious.visibility = View.GONE
+                    blankHolder.arrowNext.visibility = View.GONE
+                }
             }
             TYPE_LAST -> {
                 val blankHolder = holder as BlankHolder
-                blankHolder.blankTextView.text = "LAST"
+                if(item.size > numExtraType) {
+                    blankHolder.arrowPrevious.visibility = View.GONE
+                    blankHolder.arrowNext.visibility = View.VISIBLE
+                } else {
+                    blankHolder.arrowPrevious.visibility = View.GONE
+                    blankHolder.arrowNext.visibility = View.GONE
+                }
             }
         }
 
@@ -80,7 +92,8 @@ class MultipleTypeAdapter(
     }
 
     class BlankHolder(binding: RowBlankBinding) : RecyclerView.ViewHolder(binding.root) {
-        var blankTextView: TextView = binding.rowBlankTv
+        val arrowPrevious: ImageView = binding.rowBlankArrowPrevious
+        val arrowNext: ImageView = binding.rowBlankArrowNext
     }
 
     private fun setAnimation(viewToAnimate: View, position: Int) {

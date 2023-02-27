@@ -6,8 +6,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.bofu.beerbox.R
 import com.bofu.beerbox.extensions.hasConnection
 import com.bofu.beerbox.models.Beer
+import com.bofu.beerbox.models.Filter
 import com.bofu.beerbox.models.NetworkResult
 import com.bofu.beerbox.models.UiState
 import com.bofu.beerbox.services.BeerService
@@ -31,9 +33,10 @@ class BeerViewModel(
     private var page = 1
 
     // For internal usage
-    private val _beerLiveData = MutableLiveData<List<Beer>>()
+    private var _beers = mutableListOf<Beer>()
+    private val _beerLiveData = MutableLiveData(_beers)
     // Only publicly exposed, never mutable, as read-only LiveData
-    val beerLiveData: LiveData<List<Beer>> = _beerLiveData
+    val beerLiveData: LiveData<MutableList<Beer>> = _beerLiveData
 
 
     // StateFlow can be exposed from ViewModel so that the View can listen for UI state updates
@@ -41,13 +44,21 @@ class BeerViewModel(
     private val _uiStateFlow = MutableStateFlow(UiState())
     val uiStateFlow: StateFlow<UiState> = _uiStateFlow
 
+    private var _filter = mutableListOf<Filter>()
+    private val _filterLiveData = MutableLiveData(_filter)
+    val filterLiveData: LiveData<MutableList<Filter>> = _filterLiveData
+
     init {
         fetchData()
+        getFilter()
     }
 
     fun fetchData(addend: Int = UNCHANGED) {
 
+        // Check connect before
         if(!checkConnection()) return
+        // Fetch data only when it's not busy
+        if(_uiStateFlow.value.isLoading) return
 
         // The viewModelScope is automatically canceled if the ViewModel is cleared.
         // This dispatcher is optimized to perform disk or network I/O outside of the main thread.
@@ -62,7 +73,8 @@ class BeerViewModel(
 
             when(val networkResult: NetworkResult = beerService.getBeers(sum)){
                 is NetworkResult.ResponseSuccess -> {
-                    _beerLiveData.postValue(networkResult.data)
+                    _beers = networkResult.data
+                    _beerLiveData.postValue(_beers)
                     page = sum
                 }
                 is NetworkResult.Exception -> {
@@ -87,6 +99,56 @@ class BeerViewModel(
         } else {
             sum
         }
+    }
+
+    private fun getFilter(){
+        viewModelScope.launch(Dispatchers.IO) {
+            val tagNames = getApplication<Application>().applicationContext.resources.getStringArray(R.array.beer_tags)
+
+            tagNames.forEach {
+                _filter.add(Filter(it, false))
+            }
+
+            _filterLiveData.postValue(_filter)
+        }
+    }
+    
+    fun setFilter(selectedFilter: Filter){
+        viewModelScope.launch(Dispatchers.IO) {
+
+            _filter.map {
+                if (it.name.lowercase() == selectedFilter.name.lowercase()) {
+                    it.isChecked = !selectedFilter.isChecked
+                } else {
+                    it.isChecked = false
+                }
+            }
+            _filterLiveData.postValue(_filter)
+            performFilter(_beers)
+        }
+    }
+
+    private fun performFilter(beers: MutableList<Beer>?){
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            if(hasNoFilter()){
+                _beerLiveData.postValue(beers)
+            } else {
+                val keyword = _filter.single { it.isChecked }.name
+                val filteredBeers = beers?.filter{
+                    it.name.lowercase().contains(keyword.lowercase()) ||
+                    it.tagline.lowercase().contains(keyword.lowercase()) ||
+                    it.description.contains(keyword.lowercase())
+                } as MutableList<Beer>
+
+                _beerLiveData.postValue(filteredBeers)
+            }
+        }
+    }
+
+    fun hasNoFilter(): Boolean{
+        return _filter.none { it.isChecked }
     }
 
     // The function used to measure execution time of Android code

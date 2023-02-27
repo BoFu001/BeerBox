@@ -9,9 +9,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bofu.beerbox.R
+import com.bofu.beerbox.adapters.FilterAdapter
 import com.bofu.beerbox.adapters.MultipleTypeAdapter
 import com.bofu.beerbox.databinding.ActivityBeerBinding
 import com.bofu.beerbox.models.Beer
+import com.bofu.beerbox.models.Filter
 import com.bofu.beerbox.models.UiState
 import com.bofu.beerbox.services.BeerService
 import com.bofu.beerbox.utils.RefreshScrollListener
@@ -25,6 +27,7 @@ class BeerActivity : BaseActivity() {
     private val TAG = javaClass.simpleName
     private val binding: ActivityBeerBinding by lazy { ActivityBeerBinding.inflate(layoutInflater) }
     private val beerAdapter by lazy { MultipleTypeAdapter(mutableListOf(), number_extra_types, this::selectBeer) }
+    private val filterAdapter by lazy { FilterAdapter(mutableListOf(), this::selectFilter) }
     private val beerViewModel: BeerViewModel by viewModels {
         ViewModelFactory(application, BeerService())
     }
@@ -36,6 +39,7 @@ class BeerActivity : BaseActivity() {
         navigationBarSetup()
         beerViewModelSetup()
         beerRecyclerViewSetup()
+        filterRecyclerViewSetup()
         retryBtnSetup()
     }
 
@@ -57,12 +61,25 @@ class BeerActivity : BaseActivity() {
 
         binding.beerRecyclerview.addOnScrollListener(object : RefreshScrollListener(resources, number_extra_types) {
             override fun pullDownToRefresh(){
-                beerViewModel.fetchData(BeerViewModel.PREVIOUS)
+                if(beerViewModel.hasNoFilter()){
+                    beerViewModel.fetchData(BeerViewModel.PREVIOUS)
+                }
             }
             override fun pullUpToRefresh(){
-                beerViewModel.fetchData(BeerViewModel.NEXT)
+                if(beerViewModel.hasNoFilter()){
+                    beerViewModel.fetchData(BeerViewModel.NEXT)
+                }
             }
         })
+    }
+
+    private fun filterRecyclerViewSetup(){
+
+        binding.beerFilterRecyclerview.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            setHasFixedSize(true)
+            adapter = filterAdapter
+        }
     }
 
     private fun beerViewModelSetup() {
@@ -81,12 +98,19 @@ class BeerActivity : BaseActivity() {
         }
 
         beerViewModel.beerLiveData.observe(this) {
-
             goToTop()
-
             // Update new list of beer
             beerAdapter.update(it)
+            showNoResultView(it.size == 0)
         }
+
+
+
+        beerViewModel.filterLiveData.observe(this) {
+            filterAdapter.update(it)
+        }
+
+
     }
 
     private fun retryBtnSetup(){
@@ -99,6 +123,10 @@ class BeerActivity : BaseActivity() {
         showDialog(beer.name, beer.tagline, beer.description, beer.image_url)
     }
 
+    private fun selectFilter(filter: Filter){
+        beerViewModel.setFilter(filter)
+    }
+
     private fun goToTop() {
 
         val linearLayoutManager = binding.beerRecyclerview.layoutManager as LinearLayoutManager
@@ -109,7 +137,6 @@ class BeerActivity : BaseActivity() {
     private fun render(uiState: UiState){
         showNoConnectionView(uiState.hasConnection)
         showProgressBar(uiState.isLoading)
-        //showNoResultView(uiState.errorMessage)
         showError(uiState.errorMessage)
     }
 
@@ -127,13 +154,18 @@ class BeerActivity : BaseActivity() {
         }
     }
 
-    /*
     private fun showNoResultView(bool: Boolean){
         when(bool){
-            true -> if (mainViewModel.viewState.value!!.hasConnection) binding.mainNoResultView.noResultViewLayout.visibility = View.VISIBLE
-            false -> binding.mainNoResultView.noResultViewLayout.visibility = View.GONE
+            true -> {
+                binding.beerNoResultView.noResultViewLayout.visibility = View.VISIBLE
+                binding.beerRecyclerview.visibility = View.GONE
+            }
+            false -> {
+                binding.beerNoResultView.noResultViewLayout.visibility = View.GONE
+                binding.beerRecyclerview.visibility = View.VISIBLE
+            }
         }
-    }*/
+    }
 
     private fun showError(message: String?){
         message?.let {

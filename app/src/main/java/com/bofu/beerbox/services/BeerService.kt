@@ -13,7 +13,7 @@ interface BeerApi {
     @GET("beers")
     suspend fun getBeers(
         @Query("page") page: Int
-    ): List<Beer>
+    ): MutableList<Beer>
 }
 
 class BeerService: BaseService() {
@@ -32,7 +32,7 @@ class BeerService: BaseService() {
             NetworkResult.ResponseSuccess(response)
 
         } catch (exception: Throwable) {
-            Log.d(TAG, "dddd getBeers On failure, message: ${exception.message}")
+            Log.d(TAG, "getBeers On failure, message: ${exception.message}")
             NetworkResult.Exception(exception)
         }
     }

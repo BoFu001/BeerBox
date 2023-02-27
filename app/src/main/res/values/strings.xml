@@ -20,4 +20,13 @@
     <string name="oops">Oops!</string>
     <string name="retry">Retry</string>
     <string name="not_connected_hint">Sorry, there is no internet connection at the moment.</string>
+
+    <!-- Beer Filter -->
+    <string-array name="beer_tags">
+        <item>Blonde</item>
+        <item>Lager</item>
+        <item>Malts</item>
+        <item>Stouts</item>
+        <item>Porters</item>
+    </string-array>
 </resources>

@@ -3,12 +3,15 @@
     <color name="yellow_200">#FFFFE165</color>
     <color name="yellow_500">#FFFCAF32</color>
     <color name="yellow_700">#FFC48000</color>
+    <color name="pink_100">#FFFFF7F4</color>
     <color name="pink_200">#FFFFE4DA</color>
     <color name="pink_500">#FFFCB2A8</color>
     <color name="pink_700">#FFC78279</color>
 
+    <color name="yellow_500_transparent">#4DFCAF32</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray_light">#FFDCDCDC</color>
+    <color name="gray">#FF717171</color>
     <color name="gray_dark">#FF3C3C3C</color>
     <color name="black">#FF000000</color>
     <color name="black2">#FF0A1418</color>
