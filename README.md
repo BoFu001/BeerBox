@@ -1,4 +1,4 @@
-# Beer
+# Beer Box
 
 This is an Android app written in Kotlin, which displays a list of beers. User can filter beers by using tags and by typing a keyword in search view. The orientation of the Activity is not blocked.
 
